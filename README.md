@@ -5,7 +5,8 @@
 
 A quickly built example of using Google Sheets as a database for a static page.
 
-The otherwise static page displays a searchable and filterable table based of a Google Sheets sheet. Intially built to help compare similar products.
+The otherwise static page displays a searchable and filterable table based of a Google Sheets file. 
+Intially built to help compare similar products.
 
 Uses V3 of the Google Sheets API
 
@@ -20,8 +21,8 @@ Available filters are:
  * choice
  * search
  
-Filters are applied by adding the filter name surrounded by hyphens. `ColumnName-choice-range-`
-Multiple filters can be applied to each column.
+Filters are applied by adding the filter name surrounded by hyphens. `ColumnName-choice-range-`. 
+Multiple filters can be applied to each column. 
 Columns can be spread over multiple sheets within the same file, the comparison tool will collate them together and create all relevant filters.
 
 
