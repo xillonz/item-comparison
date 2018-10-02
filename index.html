@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>SSD Comparison</title>   
+    <style>
+        .slider-container {
+        width: 300px;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        margin: 0 auto;
+        }
+        .slider-container .back-bar {
+        height: 10px;
+        position: relative;
+        }
+        .slider-container .back-bar .selected-bar {
+        position: absolute;
+        height: 100%;
+        }
+        .slider-container .back-bar .pointer {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: red;
+        cursor: col-resize;
+        opacity: 1;
+        z-index: 2;
+        }
+        .slider-container .back-bar .pointer.last-active {
+        z-index: 3;
+        }
+        .slider-container .back-bar .pointer-label {
+        position: absolute;
+        top: -17px;
+        font-size: 8px;
+        background: white;
+        white-space: nowrap;
+        line-height: 1;
+        }
+        .slider-container .back-bar .focused {
+        z-index: 10;
+        }
+        .slider-container .clickable-dummy {
+        cursor: pointer;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        }
+        .slider-container .scale {
+        top: 2px;
+        position: relative;
+        }
+        .slider-container .scale span {
+        position: absolute;
+        height: 5px;
+        border-left: 1px solid #999;
+        font-size: 0;
+        }
+        .slider-container .scale ins {
+        font-size: 9px;
+        text-decoration: none;
+        position: absolute;
+        left: 0;
+        top: 5px;
+        color: #999;
+        line-height: 1;
+        }
+        .slider-container.slider-readonly .clickable-dummy,
+        .slider-container.slider-readonly .pointer {
+        cursor: auto;
+        }
+        .theme-green .back-bar {
+        height: 5px;
+        border-radius: 2px;
+        background-color: #eeeeee;
+        background-color: #e7e7e7;
+        background-image: -moz-linear-gradient(top, #eeeeee, #dddddd);
+        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#eeeeee), to(#dddddd));
+        background-image: -webkit-linear-gradient(top, #eeeeee, #dddddd);
+        background-image: -o-linear-gradient(top, #eeeeee, #dddddd);
+        background-image: linear-gradient(to bottom, #eeeeee, #dddddd);
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffeeeeee', endColorstr='#ffdddddd', GradientType=0);
+        }
+        .theme-green .back-bar .selected-bar {
+        border-radius: 2px;
+        background-color: #a1fad0;
+        background-image: -moz-linear-gradient(top, #bdfade, #76fabc);
+        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#bdfade), to(#76fabc));
+        background-image: -webkit-linear-gradient(top, #bdfade, #76fabc);
+        background-image: -o-linear-gradient(top, #bdfade, #76fabc);
+        background-image: linear-gradient(to bottom, #bdfade, #76fabc);
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffbdfade', endColorstr='#ff76fabc', GradientType=0);
+        }
+        .theme-green .back-bar .pointer {
+        width: 14px;
+        height: 14px;
+        top: -5px;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        border-radius: 10px;
+        border: 1px solid #AAA;
+        background-color: #e7e7e7;
+        background-image: -moz-linear-gradient(top, #eeeeee, #dddddd);
+        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#eeeeee), to(#dddddd));
+        background-image: -webkit-linear-gradient(top, #eeeeee, #dddddd);
+        background-image: -o-linear-gradient(top, #eeeeee, #dddddd);
+        background-image: linear-gradient(to bottom, #eeeeee, #dddddd);
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffeeeeee', endColorstr='#ffdddddd', GradientType=0);
+        }
+        .theme-green .back-bar .pointer-label {
+        color: #999;
+        }
+        .theme-green .back-bar .focused {
+        color: #333;
+        }
+        .theme-green .scale span {
+        border-left: 1px solid #e5e5e5;
+        }
+        .theme-green .scale ins {
+        color: #999;
+        }
+        .theme-blue .back-bar {
+        height: 5px;
+        border-radius: 2px;
+        background-color: #eeeeee;
+        background-color: #e7e7e7;
+        background-image: -moz-linear-gradient(top, #eeeeee, #dddddd);
+        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#eeeeee), to(#dddddd));
+        background-image: -webkit-linear-gradient(top, #eeeeee, #dddddd);
+        background-image: -o-linear-gradient(top, #eeeeee, #dddddd);
+        background-image: linear-gradient(to bottom, #eeeeee, #dddddd);
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffeeeeee', endColorstr='#ffdddddd', GradientType=0);
+        }
+        .theme-blue .back-bar .selected-bar {
+        border-radius: 2px;
+        background-color: #92c1f9;
+        background-image: -moz-linear-gradient(top, #b1d1f9, #055459);
+        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#b1d1f9), to(#055459));
+        background-image: -webkit-linear-gradient(top, #b1d1f9, #055459);
+        background-image: -o-linear-gradient(top, #b1d1f9, #055459);
+        background-image: linear-gradient(to bottom, #b1d1f9, #055459);
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffb1d1f9', endColorstr='#ff64a8f9', GradientType=0);
+        }
+        .theme-blue .back-bar .pointer {
+        width: 14px;
+        height: 14px;
+        top: -5px;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        border-radius: 10px;
+        border: 1px solid #AAA;
+        background-color: #e7e7e7;
+        background-image: -moz-linear-gradient(top, #eeeeee, #dddddd);
+        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#eeeeee), to(#dddddd));
+        background-image: -webkit-linear-gradient(top, #eeeeee, #dddddd);
+        background-image: -o-linear-gradient(top, #eeeeee, #dddddd);
+        background-image: linear-gradient(to bottom, #eeeeee, #dddddd);
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffeeeeee', endColorstr='#ffdddddd', GradientType=0);
+        }
+        .theme-blue .back-bar .pointer-label {
+        color: #999;
+        }
+        .theme-blue .back-bar .focused {
+        color: #333;
+        }
+        .theme-blue .scale span {
+        border-left: 1px solid #e5e5e5;
+        }
+        .theme-blue .scale ins {
+        color: #999;
+        }
+
+    </style> 
+    <style>        
+        *{
+            font-family:Arial, Helvetica, sans-serif;
+            box-sizing: border-box;
+        }
+
+        html, body{
+            height: 100%;
+        }
+
+        body{
+            background: #e2e1e0;
+            margin: 0;
+        }
+
+        header{
+            height: 60px;
+            width: 100%;
+            background-color: #055459; 
+            position: relative;
+            z-index: 3;
+            box-shadow: 0 0 4px rgba(0,0,0,.14), 0 3px 10px rgba(0,0,0,.28);
+            line-height: 60px;
+            padding: 0 20px;
+        }
+
+        .hamburger{
+            display: inline-block;
+            vertical-align: middle;
+            height: 30px;
+            width: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            padding: 14px 0;
+        }
+
+        .hamburger:hover{
+            background: rgba(255,255,255,0.1)
+        }
+
+        .hamburger .patty{
+            width: 20px;
+            height: 2px;
+            margin: 0 auto;
+            background: #fff;
+            position: relative;
+        }
+
+        .hamburger .patty::before, .hamburger .patty::after{
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 2px;
+            background: #fff;
+        }
+
+        .hamburger .patty::before{
+            top: -5px;
+        }
+
+        .hamburger .patty::after{
+            top: 5px;
+        }
+
+        header h1{
+            color: #fff;
+            margin: 0 20px;
+            font-size: 24px;
+            font-weight: normal;
+            display: inline;
+            vertical-align: middle;
+        }
+
+        #quick-search{
+            margin: 0 20px 0 80px;
+            height: 35px;
+            padding: 5px 10px;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            width: 45%;
+            outline: none;
+            border-radius: 4px;
+        }
+
+        #quick-search::placeholder{
+            color: #fff;
+            opacity: 0.8;
+        }
+
+        #quick-search:-ms-input-placeholder { /* Internet Explorer 10-11 */
+            color: #fff;
+            opacity: 0.8;
+        }
+
+        #quick-search::-ms-input-placeholder { /* Microsoft Edge */
+            color: #fff;
+            opacity: 0.8;
+        }
+
+        main{
+            width: calc(100% - 270px);
+            max-height: calc(100% - 105px);
+            margin: 25px 25px 0px 245px;
+            background: #fff;
+            border-radius: 2px;
+            display: block;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            transition: all 0.4s ease;
+            overflow: auto;
+        }
+
+        .sidebar{
+            height: calc(100% - 60px);
+            width: 220px;
+            position: fixed;
+            z-index: 1;
+            top: 60px;
+            left: 0;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            overflow-x: hidden;
+            padding: 20px 15px 20px 20px;
+            transition: left 0.4s ease;
+        }
+
+        main.closed-sidebar{
+            width: calc(100% - 50px);
+            margin: 25px 25px 0px 25px;
+        }
+
+        main.closed-sidebar .sidebar{
+            left: -220px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+
+        table th, table td {
+            text-align: left;
+            padding: 15px 30px 15px 15px;
+            font-size: 14px;
+            overflow: hidden;
+            max-width: 0;
+            text-overflow: ellipsis;
+            line-height: 1.7;
+            text-align: right;
+            color: #444;
+        }
+
+        table tr {
+            border-bottom: 1px solid #ddd;
+        }
+
+        table th{
+            color: #888;
+            font-weight: normal;
+            font-size: 12px;
+        }
+
+        table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .sortable{
+            position: relative;
+            cursor: pointer;
+        }
+
+        .sortable::before, .sortable::after{
+            content: "";
+            display: table-cell;
+            position: absolute;                                   
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            right: 5px;                
+        }
+
+        .sortable::before{
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid #888;
+            top: 9px;
+        }
+
+        .sortable::after{
+            border-top: 5px solid #888; 
+            border-bottom: 5px solid transparent;
+            top: 21px;
+        }
+
+        .sort-asc::after{
+            border-top: 5px solid transparent;
+        }
+
+        .sort-desc::before{
+            border-bottom: 5px solid transparent;
+        }
+
+        .a{
+            color: rgb(55, 94, 201);
+            cursor: pointer;
+        }
+
+        a.external-link{
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin: 7px 0;
+        }  
+        
+        .loader-wrap{
+            padding: 40px;
+        }
+
+        .loader.large-loader {
+            height: 70px;
+            width: 70px;
+            box-shadow: inset 0 0 0 10px #055459;
+        }   
+
+        .loader {
+            border-radius: 50%;
+            position: relative;
+            height: 40px;
+            width: 40px;
+            background: #FFF;
+            box-shadow: inset 0 0 0 5px #055459;
+            margin: 30px auto;
+            -webkit-animation: load 5s infinite linear;
+            animation: load 5s infinite linear;
+        }  
+
+        .loader.large-loader:before {
+            border-radius: 40px 0 0 40px;
+            -webkit-transform-origin: 40px 40px;
+            transform-origin: 40px 40px;
+        }
+
+        .loader.large-loader:after {
+            left: 35px;
+            border-radius: 0 40px 40px 0;
+            -webkit-transform-origin: 0 40px;
+            transform-origin: 0 40px;
+        }
+
+        .loader.large-loader:before, .loader.large-loader:after {
+            width: 40px;
+            height: 80px;
+            top: -5px;
+        }
+
+        .loader:before {
+            left: -2px;            
+            border-radius: 24px 0 0 24px;
+            -webkit-transform-origin: 21px 21px;
+            transform-origin: 21px 21px;
+            -webkit-animation: load 1.5s infinite ease 1.1s;
+            animation: load 1.5s infinite ease 1.1s;
+        }
+
+        .loader:after {
+            
+            left: 20px;
+            border-radius: 0 24px 24px 0;
+            -webkit-transform-origin: 0 21px;
+            transform-origin: 0 21px;
+            -webkit-animation: load 1.5s infinite ease;
+            animation: load 1.5s infinite ease;
+        }
+
+        .loader:before, .loader:after {
+            position: absolute;
+            content: '';
+            width: 22px;
+            height: 42px;
+            top: -1px;
+            background: #FFF;
+        }
+
+        @keyframes load{
+            0% {
+                -webkit-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+            100% {
+                -webkit-transform: rotate(360deg);
+                transform: rotate(360deg);
+            }
+        }
+
+
+        .filter-wrap {
+            margin: 0;
+            border-bottom: 1px solid #ddd;
+            padding: 15px 0 30px 0;
+            color: #444;
+            overflow: hidden;
+            max-height: 2000px;
+            transition: all 0.2s ease-out;
+        }
+
+        .filter-wrap.closed-filter{
+            max-height: 30px;
+        }
+
+        .filter-wrap:first-child{
+            padding-top: 0;
+        }
+
+        .filter-header{
+            font-size: 15px;
+            margin: 5px 0 15px 0;
+            padding: 0 0 0 8px;
+            position: relative;
+            cursor: default;
+        }
+
+        .filter-header:before{
+            content: "-";
+            position: relative;
+            cursor: pointer;
+            left: -8px;
+            display: inline-block;
+            width: 13px;
+            height: 13px;
+            text-align: center;
+            background: #eee;
+            line-height: 13px;
+            border-radius: 50%;
+            font-weight: normal;
+            color: #777;
+        }
+
+        .filter-header:hover:before{
+            background: #dedede;
+        }
+
+        .filter-wrap.closed-filter .filter-header:before{
+            content: "+";
+        }
+
+        .choice-box{
+            margin: 8px 0;
+        }
+
+        .search-filter, .sidebar input[type="text"], .sidebar input[type="number"]{
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 4px;
+            background: rgba(0,0,0,0.1);
+            outline: none;
+        }
+
+        .range-wrap .range-filter-text{
+            margin-bottom: 10px;
+        }
+
+        .range-wrap .range-filter-text.range-upper{
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: inline;
+        }
+
+        .choice-filter {
+            display: none;
+        }
+
+        .choice-filter + label{
+            padding-left: 10px;
+            position: relative;
+        }
+
+        .choice-filter + label:before {
+            content: '';
+            line-height: 13px;
+            font-size: 14px;
+            position: absolute;
+            width: 13px;
+            height: 13px;
+            padding: 4px;
+            text-align: center;
+            vertical-align: middle;
+            top: 0px;
+            left: -10px;
+            color: #777;
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 3px;
+            display: inline-block;
+            position: relative;
+        }
+
+        .choice-filter:checked + label:before {
+            content: '\2714';
+        }
+
+        thead tr{
+            background-color: #fff;
+            border-bottom: 1px solid #bbb;
+        }
+
+        thead th{
+            position: relative;
+            cursor: pointer;
+        }
+
+        thead th::before, thead th::after{
+            content: "";
+            display: table-cell;
+            position: absolute;
+            border-top: 5px solid transparent;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            right: 10px;              
+        }
+
+        thead th.sort-asc::before{
+            top: 14px;
+            border-bottom: 5px solid #888;
+        }
+
+        thead th.sort-desc::after{
+            top: 26px;
+            border-top: 5px solid #888;
+        }
+
+        #ruler { visibility: hidden; white-space: nowrap; font-size: 14px;}
+
+        ::-webkit-scrollbar {
+            width: 16px;
+            height: 16px;
+        }
+        ::-webkit-scrollbar-thumb {
+            border: 4px solid rgba(0, 0, 0, 0);
+            background-clip: padding-box;
+            -webkit-border-radius: 7px;
+            background-color: rgba(0, 0, 0, 0.15);
+        }
+        ::-webkit-scrollbar-button {
+            width: 0;
+            height: 0;
+            display: none;
+        }
+        ::-webkit-scrollbar-corner {
+            background-color: transparent;
+        }
+
+        
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>        
+        /**
+        * jRange - Awesome range control
+        *
+        * Written by
+        * ----------
+        * Nitin Hayaran (nitinhayaran@gmail.com)
+        *
+        * Licensed under the MIT (MIT-LICENSE.txt).
+        *
+        * @author Nitin Hayaran
+        * @version 0.1-RELEASE
+        *
+        * Dependencies
+        * ------------
+        * jQuery (http://jquery.com)
+        *
+        **/
+        !function($,t,i,s){"use strict";var o=function(){return this.init.apply(this,arguments)};o.prototype={defaults:{onstatechange:function(){},ondragend:function(){},onbarclicked:function(){},isRange:!1,showLabels:!0,showScale:!0,step:1,format:"%s",theme:"theme-green",width:300,disable:!1,snap:!1},template:'<div class="slider-container">			<div class="back-bar">                <div class="selected-bar"></div>                <div class="pointer low"></div><div class="pointer-label low">123456</div>                <div class="pointer high"></div><div class="pointer-label high">456789</div>                <div class="clickable-dummy"></div>            </div>            <div class="scale"></div>		</div>',init:function(t,i){this.options=$.extend({},this.defaults,i),this.inputNode=$(t),this.options.value=this.inputNode.val()||(this.options.isRange?this.options.from+","+this.options.from:""+this.options.from),this.domNode=$(this.template),this.domNode.addClass(this.options.theme),this.inputNode.after(this.domNode),this.domNode.on("change",this.onChange),this.pointers=$(".pointer",this.domNode),this.lowPointer=this.pointers.first(),this.highPointer=this.pointers.last(),this.labels=$(".pointer-label",this.domNode),this.lowLabel=this.labels.first(),this.highLabel=this.labels.last(),this.scale=$(".scale",this.domNode),this.bar=$(".selected-bar",this.domNode),this.clickableBar=this.domNode.find(".clickable-dummy"),this.interval=this.options.to-this.options.from,this.render()},render:function(){return 0!==this.inputNode.width()||this.options.width?(this.options.width=this.options.width||this.inputNode.width(),this.domNode.width(this.options.width),this.inputNode.hide(),this.isSingle()&&(this.lowPointer.hide(),this.lowLabel.hide()),this.options.showLabels||this.labels.hide(),this.attachEvents(),this.options.showScale&&this.renderScale(),void this.setValue(this.options.value)):void console.log("jRange : no width found, returning")},isSingle:function(){return"number"==typeof this.options.value?!0:-1===this.options.value.indexOf(",")&&!this.options.isRange},attachEvents:function(){this.clickableBar.click($.proxy(this.barClicked,this)),this.pointers.on("mousedown touchstart",$.proxy(this.onDragStart,this)),this.pointers.bind("dragstart",function(t){t.preventDefault()})},onDragStart:function(t){if(!(this.options.disable||"mousedown"===t.type&&1!==t.which)){t.stopPropagation(),t.preventDefault();var s=$(t.target);this.pointers.removeClass("last-active"),s.addClass("focused last-active"),this[(s.hasClass("low")?"low":"high")+"Label"].addClass("focused"),$(i).on("mousemove.slider touchmove.slider",$.proxy(this.onDrag,this,s)),$(i).on("mouseup.slider touchend.slider touchcancel.slider",$.proxy(this.onDragEnd,this))}},onDrag:function(t,i){i.stopPropagation(),i.preventDefault(),i.originalEvent.touches&&i.originalEvent.touches.length?i=i.originalEvent.touches[0]:i.originalEvent.changedTouches&&i.originalEvent.changedTouches.length&&(i=i.originalEvent.changedTouches[0]);var s=i.clientX-this.domNode.offset().left;this.domNode.trigger("change",[this,t,s])},onDragEnd:function(t){this.pointers.removeClass("focused").trigger("rangeslideend"),this.labels.removeClass("focused"),$(i).off(".slider"),this.options.ondragend.call(this,this.options.value)},barClicked:function(t){if(!this.options.disable){var i=t.pageX-this.clickableBar.offset().left;if(this.isSingle())this.setPosition(this.pointers.last(),i,!0,!0);else{var s=Math.abs(parseFloat(this.pointers.first().css("left"),10)),o=this.pointers.first().width()/2,e=Math.abs(parseFloat(this.pointers.last().css("left"),10)),n=this.pointers.first().width()/2,a=Math.abs(s-i+o),h=Math.abs(e-i+n),l;l=a==h?s>i?this.pointers.first():this.pointers.last():h>a?this.pointers.first():this.pointers.last(),this.setPosition(l,i,!0,!0)}this.options.onbarclicked.call(this,this.options.value)}},onChange:function(t,i,s,o){var e,n;e=0,n=i.domNode.width(),i.isSingle()||(e=s.hasClass("high")?parseFloat(i.lowPointer.css("left"))+i.lowPointer.width()/2:0,n=s.hasClass("low")?parseFloat(i.highPointer.css("left"))+i.highPointer.width()/2:i.domNode.width());var a=Math.min(Math.max(o,e),n);i.setPosition(s,a,!0)},setPosition:function(t,i,s,o){var e,n,a=parseFloat(this.lowPointer.css("left")),h=parseFloat(this.highPointer.css("left"))||0,l=this.highPointer.width()/2;if(s||(i=this.prcToPx(i)),this.options.snap){var r=this.correctPositionForSnap(i);if(-1===r)return;i=r}t[0]===this.highPointer[0]?h=Math.round(i-l):a=Math.round(i-l),t[o?"animate":"css"]({left:Math.round(i-l)}),this.isSingle()?e=0:(e=a+l,n=h+l);var d=Math.round(h+l-e);this.bar[o?"animate":"css"]({width:Math.abs(d),left:d>0?e:e+d}),this.showPointerValue(t,i,o),this.isReadonly()},correctPositionForSnap:function(t){var i=this.positionToValue(t)-this.options.from,s=this.options.width/(this.interval/this.options.step),o=i/this.options.step*s;return o+s/2>=t&&t>=o-s/2?o:-1},setValue:function(t){var i=t.toString().split(",");i[0]=Math.min(Math.max(i[0],this.options.from),this.options.to)+"",i.length>1&&(i[1]=Math.min(Math.max(i[1],this.options.from),this.options.to)+""),this.options.value=t;var s=this.valuesToPrc(2===i.length?i:[0,i[0]]);this.isSingle()?this.setPosition(this.highPointer,s[1]):(this.setPosition(this.lowPointer,s[0]),this.setPosition(this.highPointer,s[1]))},renderScale:function(){for(var t=this.options.scale||[this.options.from,this.options.to],i=Math.round(100/(t.length-1)*10)/10,s="",o=0;o<t.length;o++)s+='<span style="left: '+o*i+'%">'+("|"!=t[o]?"<ins>"+t[o]+"</ins>":"")+"</span>";this.scale.html(s),$("ins",this.scale).each(function(){$(this).css({marginLeft:-$(this).outerWidth()/2})})},getBarWidth:function(){var t=this.options.value.split(",");return t.length>1?parseFloat(t[1])-parseFloat(t[0]):parseFloat(t[0])},showPointerValue:function(t,i,o){var e=$(".pointer-label",this.domNode)[t.hasClass("low")?"first":"last"](),n,a=this.positionToValue(i);if($.isFunction(this.options.format)){var h=this.isSingle()?s:t.hasClass("low")?"low":"high";n=this.options.format(a,h)}else n=this.options.format.replace("%s",a);var l=e.html(n).width(),r=i-l/2;r=Math.min(Math.max(r,0),this.options.width-l),e[o?"animate":"css"]({left:r}),this.setInputValue(t,a)},valuesToPrc:function(t){var i=100*(parseFloat(t[0])-parseFloat(this.options.from))/this.interval,s=100*(parseFloat(t[1])-parseFloat(this.options.from))/this.interval;return[i,s]},prcToPx:function(t){return this.domNode.width()*t/100},isDecimal:function(){return-1!==(this.options.value+this.options.from+this.options.to).indexOf(".")},positionToValue:function(t){var i=t/this.domNode.width()*this.interval;if(i=parseFloat(i,10)+parseFloat(this.options.from,10),this.isDecimal()){var s=Math.round(Math.round(i/this.options.step)*this.options.step*100)/100;if(0!==s)for(s=""+s,-1===s.indexOf(".")&&(s+=".");s.length-s.indexOf(".")<3;)s+="0";else s="0.00";return s}return Math.round(i/this.options.step)*this.options.step},setInputValue:function(t,i){if(this.isSingle())this.options.value=i.toString();else{var s=this.options.value.split(",");t.hasClass("low")?this.options.value=i+","+s[1]:this.options.value=s[0]+","+i}this.inputNode.val()!==this.options.value&&(this.inputNode.val(this.options.value).trigger("change"),this.options.onstatechange.call(this,this.options.value))},getValue:function(){return this.options.value},getOptions:function(){return this.options},getRange:function(){return this.options.from+","+this.options.to},isReadonly:function(){this.domNode.toggleClass("slider-readonly",this.options.disable)},disable:function(){this.options.disable=!0,this.isReadonly()},enable:function(){this.options.disable=!1,this.isReadonly()},toggleDisable:function(){this.options.disable=!this.options.disable,this.isReadonly()},updateRange:function(t,i){var s=t.toString().split(",");this.interval=parseInt(s[1])-parseInt(s[0]),i?this.setValue(i):this.setValue(this.getValue())}};var e="jRange";$.fn[e]=function(i){var s=arguments,n;return this.each(function(){var a=$(this),h=$.data(this,"plugin_"+e),l="object"==typeof i&&i;h||(a.data("plugin_"+e,h=new o(this,l)),$(t).resize(function(){h.setValue(h.getValue())})),"string"==typeof i&&(n=h[i].apply(h,Array.prototype.slice.call(s,1)))}),n||this}}(jQuery,window,document);
+    </script>
+    <script>
+        /** @preserve jQuery.floatThead 2.1.1 - http://mkoryak.github.io/floatThead/ - Copyright (c) 2012 - 2018 Misha Koryak **/
+        !function(t){t.floatThead=t.floatThead||{},t.floatThead.defaults={headerCellSelector:"tr:visible:first>*:visible",zIndex:1001,position:"auto",top:0,bottom:0,scrollContainer:function(e){return t([])},responsiveContainer:function(e){return t([])},getSizingRow:function(t,e,o){return t.find("tbody tr:visible:first>*:visible")},floatTableClass:"floatThead-table",floatWrapperClass:"floatThead-wrapper",floatContainerClass:"floatThead-container",copyTableClass:!0,autoReflow:!1,debug:!1,support:{bootstrap:!0,datatables:!0,jqueryUI:!0,perfectScrollbar:!0},floatContainerCss:{"overflow-x":"hidden"}};var e=function(){var e={},o=Object.prototype.hasOwnProperty;e.has=function(t,e){return o.call(t,e)},e.keys=Object.keys||function(t){if(t!==Object(t))throw new TypeError("Invalid object");var o=[];for(var n in t)e.has(t,n)&&o.push(n);return o};var n=0;return e.uniqueId=function(t){var e=++n+"";return t?t+e:e},t.each(["Arguments","Function","String","Number","Date","RegExp"],function(){var t=this;e["is"+t]=function(e){return Object.prototype.toString.call(e)=="[object "+t+"]"}}),e.debounce=function(t,e,o){var n,r,a,i,l;return function(){a=this,r=arguments,i=new Date;var s=function(){var d=new Date-i;d<e?n=setTimeout(s,e-d):(n=null,o||(l=t.apply(a,r)))},d=o&&!n;return n||(n=setTimeout(s,e)),d&&(l=t.apply(a,r)),l}},e}(),o="undefined"!=typeof MutationObserver,n=function(){for(var t=3,e=document.createElement("b"),o=e.all||[];t=1+t,e.innerHTML="\x3c!--[if gt IE "+t+"]><i><![endif]--\x3e",o[0];);return 4<t?t:document.documentMode}(),r=/Gecko\//.test(navigator.userAgent),a=/WebKit\//.test(navigator.userAgent);n||r||a||(n=11);var i=function(){if(a){var e=t("<div>").css("width",0).append(t("<table>").css("max-width","100%").append(t("<tr>").append(t("<th>").append(t("<div>").css("min-width",100).text("X")))));t("body").append(e);var o=0==e.find("table").width();return e.remove(),o}return!1},l=!r&&!n,s=t(window),d=r&&window.matchMedia;if(!window.matchMedia||d){var f=window.onbeforeprint,c=window.onafterprint;window.onbeforeprint=function(){f&&f(),s.triggerHandler("beforeprint")},window.onafterprint=function(){c&&c(),s.triggerHandler("afterprint")}}function u(e){var o=e[0].parentElement;do{if("visible"!=window.getComputedStyle(o).getPropertyValue("overflow"))break}while(o=o.parentElement);return o==document.body?t([]):t(o)}function p(t){window&&window.console&&window.console.error&&window.console.error("jQuery.floatThead: "+t)}function h(t){var e=t.getBoundingClientRect();return e.width||e.right-e.left}function v(){var t=document.createElement("scrolltester");t.style.cssText="width:100px;height:100px;overflow:scroll!important;position:absolute;top:-9999px;display:block",document.body.appendChild(t);var e=t.offsetWidth-t.clientWidth;return document.body.removeChild(t),e}function b(t,e,o){var n=o?"outerWidth":"width";if(i&&t.css("max-width")){var r=0;o&&(r+=parseInt(t.css("borderLeft"),10),r+=parseInt(t.css("borderRight"),10));for(var a=0;a<e.length;a++)r+=h(e.get(a));return r}return t[n]()}t.fn.floatThead=function(r){if(r=r||{},n<8)return this;var f=null;if(e.isFunction(i)&&(i=i()),e.isString(r)){var c=r,w=Array.prototype.slice.call(arguments,1),g=this;return this.filter("table").each(function(){var o=t(this),n=o.data("floatThead-lazy");n&&o.floatThead(n);var r=o.data("floatThead-attached");if(r&&e.isFunction(r[c])){var a=r[c].apply(this,w);void 0!==a&&(g=a)}}),g}var m=t.extend({},t.floatThead.defaults||{},r);if(t.each(r,function(o,n){o in t.floatThead.defaults||!m.debug||p("Used ["+o+"] key to init plugin, but that param is not an option for the plugin. Valid options are: "+e.keys(t.floatThead.defaults).join(", "))}),m.debug){var y=t.fn.jquery.split(".");1==parseInt(y[0],10)&&parseInt(y[1],10)<=7&&p("jQuery version "+t.fn.jquery+" detected! This plugin supports 1.8 or better, or 1.7.x with jQuery UI 1.8.24 -> http://jqueryui.com/resources/download/jquery-ui-1.8.24.zip")}return this.filter(":not(."+m.floatTableClass+")").each(function(){var r=e.uniqueId(),i=t(this);if(i.data("floatThead-attached"))return!0;if(!i.is("table"))throw new Error('jQuery.floatThead must be run on a table element. ex: $("table").floatThead();');o=m.autoReflow&&o;var c=i.children("thead:first"),w=i.children("tbody:first");if(0==c.length||0==w.length)return m.debug&&(0==c.length?p("The thead element is missing."):p("The tbody element is missing.")),i.data("floatThead-lazy",m),void i.unbind("reflow").one("reflow",function(){i.floatThead(m)});i.data("floatThead-lazy")&&i.unbind("reflow"),i.data("floatThead-lazy",!1);var g,y,T=!0,C={vertical:0,horizontal:0};e.isFunction(v)&&(v=v());var x=0;!0===m.scrollContainer&&(m.scrollContainer=u);var j=m.scrollContainer(i)||t([]),S=j.length>0,z=S?t([]):m.responsiveContainer(i)||t([]),I=ct(),L=null;"auto"===m.position?L=null:"fixed"===m.position?L=!1:"absolute"===m.position?L=!0:m.debug&&p('Invalid value given to "position" option, valid is "fixed", "absolute" and "auto". You passed: ',m.position),null==L&&(L=S);var W=i.find("caption"),H=1==W.length;if(H)var q="top"===(W.css("caption-side")||W.attr("align")||"top");var R=t("<fthfoot>").css({display:"table-footer-group","border-spacing":0,height:0,"border-collapse":"collapse",visibility:"hidden"}),M=!1,k=t([]),E=n<=9&&!S&&L,D=t("<table/>"),F=t("<colgroup/>"),O=i.children("colgroup:first"),N=!0;0==O.length&&(O=t("<colgroup/>"),N=!1);var A=t("<fthtr>").css({display:"table-row","border-spacing":0,height:0,"border-collapse":"collapse"}),Q=t("<div>").css(m.floatContainerCss).attr("aria-hidden","true"),U=!1,G=t("<thead/>"),P=t('<tr class="size-row" aria-hidden="true"/>'),V=t([]),X=t([]),Y=t([]),B=t([]);G.append(P),i.prepend(O),l&&(R.append(A),i.append(R)),D.append(F),Q.append(D),m.copyTableClass&&D.attr("class",i.attr("class")),D.attr({cellpadding:i.attr("cellpadding"),cellspacing:i.attr("cellspacing"),border:i.attr("border")});var K=i.css("display");if(D.css({borderCollapse:i.css("borderCollapse"),border:i.css("border"),display:K}),S||D.css("width","auto"),"none"===K&&(U=!0),D.addClass(m.floatTableClass).css({margin:0,"border-bottom-width":0}),L){var $=function(e,o){var n=e.css("position"),r=e;if(!("relative"==n||"absolute"==n)||o){var a={paddingLeft:e.css("paddingLeft"),paddingRight:e.css("paddingRight")};Q.css(a),r=e.data("floatThead-containerWrap")||e.wrap(t("<div>").addClass(m.floatWrapperClass).css({position:"relative",clear:"both"})).parent(),e.data("floatThead-containerWrap",r),M=!0}return r};S?(k=$(j,!0)).prepend(Q):(k=$(i),i.before(Q))}else i.before(Q);Q.css({position:L?"absolute":"fixed",marginTop:0,top:L?0:"auto",zIndex:m.zIndex,willChange:"transform"}),Q.addClass(m.floatContainerClass),nt();var J={"table-layout":"fixed"},Z={"table-layout":i.css("tableLayout")||"auto"},_=i[0].style.width||"",tt=i.css("minWidth")||"";function et(t){return t+".fth-"+r+".floatTHead"}function ot(){var e=0;if(c.children("tr:visible").each(function(){e+=t(this).outerHeight(!0)}),"collapse"==i.css("border-collapse")){var o=parseInt(i.css("border-top-width"),10);o>parseInt(i.find("thead tr:first").find(">*:first").css("border-top-width"),10)&&(e-=o/2)}P.outerHeight(e),V.outerHeight(e)}function nt(){g=(e.isFunction(m.top)?m.top(i):m.top)||0,y=(e.isFunction(m.bottom)?m.bottom(i):m.bottom)||0}function rt(){if(!T){if(T=!0,L){var t=b(i,B,!0);t>k.width()&&i.css("minWidth",t)}i.css(J),D.css(J),D.append(c),w.before(G),ot()}}function at(){T&&(T=!1,L&&i.width(_),G.detach(),i.prepend(c),i.css(Z),D.css(Z),i.css("minWidth",tt),i.css("minWidth",b(i,B)))}var it=!1;function lt(t){it!=t&&(it=t,i.triggerHandler("floatThead",[t,Q]))}function st(t){L!=t&&(L=t,Q.css({position:L?"absolute":"fixed"}))}function dt(){var e,o=function(){var e,o=c.find(m.headerCellSelector);if(N?e=O.find("col").length:(e=0,o.each(function(){e+=parseInt(t(this).attr("colspan")||1,10)})),e!==x){x=e;for(var n,r=[],a=[],i=[],s=0;s<e;s++)n=o.eq(s).text(),r.push('<th class="floatThead-col" aria-label="'+n+'"/>'),a.push("<col/>"),i.push(t("<fthtd>").css({display:"table-cell",height:0,width:"auto"}));a=a.join(""),r=r.join(""),l&&(A.empty(),A.append(i),B=A.find("fthtd")),P.html(r),V=P.find("th"),N||O.html(a),X=O.find("col"),F.html(a),Y=F.find("col")}return e}();return function(){var t=Q.scrollLeft();X=O.find("col");var r,a,s,d,f=(r=i,a=X,s=B,d=n,l?s:d?m.getSizingRow(r,a,s):a);if(f.length==o&&o>0){if(!N)for(e=0;e<o;e++)X.eq(e).css("width","");at();var u=[];for(e=0;e<o;e++)u[e]=h(f.get(e));for(e=0;e<o;e++)Y.eq(e).width(u[e]),X.eq(e).width(u[e]);rt()}else D.append(c),i.css(Z),D.css(Z),ot();Q.scrollLeft(t),i.triggerHandler("reflowed",[Q])}}function ft(t){var e=j.css("border-"+t+"-width"),o=0;return e&&~e.indexOf("px")&&(o=parseInt(e,10)),o}function ct(){return"auto"==z.css("overflow-x")}function ut(){var t,e=j.scrollTop(),o=0,n=H?W.outerHeight(!0):0,r=q?n:-n,l=Q.height(),d=i.offset(),f=0,c=0;if(S){var u=j.offset();o=d.top-u.top+e,H&&q&&(o+=n),f=ft("left"),c=ft("top"),o-=c}else t=d.top-g-l+y+C.horizontal;var p=s.scrollTop(),h=s.scrollLeft(),v=function(){return(ct()?z:j).scrollLeft()||0},b=v();return function(u){I=ct();var w=i[0].offsetWidth<=0&&i[0].offsetHeight<=0;if(!w&&U)return U=!1,setTimeout(function(){i.triggerHandler("reflow")},1),null;if(w&&(U=!0,!L))return null;if("windowScroll"==u)p=s.scrollTop(),h=s.scrollLeft();else if("containerScroll"==u)if(z.length){if(!I)return;b=z.scrollLeft()}else e=j.scrollTop(),b=j.scrollLeft();else"init"!=u&&(p=s.scrollTop(),h=s.scrollLeft(),e=j.scrollTop(),b=v());if(!a||!(p<0||h<0)){if(E)st("windowScrollDone"==u);else if("windowScrollDone"==u)return null;var m,y;d=i.offset(),H&&q&&(d.top+=n);var T=i.outerHeight();if(S&&L){if(o>=e){var C=o-e+c;m=C>0?C:0,lt(!1)}else m=M?c:e,lt(!0);y=f}else!S&&L?(p>t+T+r?m=T-l+r:d.top>=p+g?(m=0,at(),lt(!1)):(m=g+p-d.top+o+(q?n:0),rt(),lt(!0)),y=b):S&&!L?(o>e||e-o>T?(m=d.top-p,at(),lt(!1)):(m=d.top+e-p-o,rt(),lt(!0)),y=d.left+b-h):S||L||(p>t+T+r?m=T+g-p+t+r:d.top>p+g?(m=d.top-p,rt(),lt(!1)):(m=g,lt(!0)),y=d.left+b-h);return{top:Math.round(m),left:Math.round(y)}}}}function pt(){var t=null,e=null,o=null;return function(r,a,l){if(null!=r&&(t!=r.top||e!=r.left)){if(8===n)Q.css({top:r.top,left:r.left});else{var s="translateX("+r.left+"px) translateY("+r.top+"px)";Q.css({"-webkit-transform":s,"-moz-transform":s,"-ms-transform":s,"-o-transform":s,transform:s,top:0,left:0})}t=r.top,e=r.left}a&&function(){var t=b(i,B,!0),e=I?z:j,o=e.width()||t,n="hidden"!=e.css("overflow-y")?o-C.vertical:o;if(Q.width(n),S){var r=100*t/n;D.css("width",r+"%")}else D.outerWidth(t)}(),l&&ot();var d=(I?z:j).scrollLeft();L&&o==d||(Q.scrollLeft(d),o=d)}}function ht(){if(j.length)if(m.support&&m.support.perfectScrollbar&&j.data().perfectScrollbar)C={horizontal:0,vertical:0};else{if("scroll"==j.css("overflow-x"))C.horizontal=v;else{var t=j.width(),e=b(i,B),o=n<r?v:0;C.horizontal=t-o<e?v:0}if("scroll"==j.css("overflow-y"))C.vertical=v;else{var n=j.height(),r=i.height(),a=t<e?v:0;C.vertical=n-a<r?v:0}}}ht();var vt=function(){dt()()};vt();var bt=ut(),wt=pt();wt(bt("init"),!0);var gt=e.debounce(function(){wt(bt("windowScrollDone"),!1)},1),mt=function(){wt(bt("windowScroll"),!1),E&&gt()},yt=function(){wt(bt("containerScroll"),!1)},Tt=e.debounce(function(){i.is(":hidden")||(ht(),nt(),vt(),bt=ut(),wt(bt("reflow"),!0,!0))},1),Ct=function(){at()},xt=function(){rt()},jt=function(t){t.matches?Ct():xt()},St=null;if(window.matchMedia&&window.matchMedia("print").addListener&&!d?(St=window.matchMedia("print")).addListener(jt):(s.on("beforeprint",Ct),s.on("afterprint",xt)),S?L?j.on(et("scroll"),yt):(j.on(et("scroll"),yt),s.on(et("scroll"),mt)):(z.on(et("scroll"),yt),s.on(et("scroll"),mt)),s.on(et("load"),Tt),function(t,o){if(8==n){var r=s.width(),a=e.debounce(function(){var t=s.width();r!=t&&(r=t,o())},1);s.on(t,a)}else s.on(t,e.debounce(o,1))}(et("resize"),function(){i.is(":hidden")||(nt(),ht(),vt(),bt=ut(),(wt=pt())(bt("resize"),!0,!0))}),i.on("reflow",Tt),m.support&&m.support.datatables&&function(t){if(t.dataTableSettings)for(var e=0;e<t.dataTableSettings.length;e++){var o=t.dataTableSettings[e].nTable;if(t[0]==o)return!0}return!1}(i)&&i.on("filter",Tt).on("sort",Tt).on("page",Tt),m.support&&m.support.bootstrap&&s.on(et("shown.bs.tab"),Tt),m.support&&m.support.jqueryUI&&s.on(et("tabsactivate"),Tt),o){var zt=null;e.isFunction(m.autoReflow)&&(zt=m.autoReflow(i,j)),zt||(zt=j.length?j[0]:i[0]),(f=new MutationObserver(function(t){for(var e=function(t){return t&&t[0]&&("THEAD"==t[0].nodeName||"TD"==t[0].nodeName||"TH"==t[0].nodeName)},o=0;o<t.length;o++)if(!e(t[o].addedNodes)&&!e(t[o].removedNodes)){Tt();break}})).observe(zt,{childList:!0,subtree:!0})}i.data("floatThead-attached",{destroy:function(){var t=".fth-"+r;return at(),i.css(Z),O.remove(),l&&R.remove(),G.parent().length&&G.replaceWith(c),lt(!1),o&&(f.disconnect(),f=null),i.off("reflow reflowed"),j.off(t),z.off(t),M&&(j.length?j.unwrap():i.unwrap()),S?j.data("floatThead-containerWrap",!1):i.data("floatThead-containerWrap",!1),i.css("minWidth",tt),Q.remove(),i.data("floatThead-attached",!1),s.off(t),St&&St.removeListener(jt),Ct=xt=function(){},function(){return i.floatThead(m)}},reflow:function(){Tt()},setHeaderHeight:function(){ot()},getFloatContainer:function(){return Q},getRowGroups:function(){return T?Q.find(">table>thead").add(i.children("tbody,tfoot")):i.children("thead,tbody,tfoot")}})}),this}}(function(){var t=window.jQuery;return"undefined"!=typeof module&&module.exports&&!t&&(t=require("jquery")),t}());
+    </script>
+</head>
+<body>
+    <header>
+        <div class="hamburger"><div class="patty"></div></div>
+        <h1>SSD Comparison</h1>
+        <input id="quick-search" type="text" placeholder="Quick Search">
+    </header>
+    <main>
+        <div class="sidebar">
+            <div id="filter-container"></div>
+        </div>
+        <div class="loader-wrap">
+            <div class="loader large-loader"></div>
+        </div>        
+        <table id="compare-table"></table>
+    </main>    
+    <span id="ruler"></span>
+
+    <script>
+        var App = {
+            sheetId: '',
+            filterBoxId: '',
+            tableId: '',
+            data: [],
+            columns: {},
+            sheetsParsed: 0,
+            filters: {
+                search: 'search',
+                range: 'range',
+                choice: 'choice'                
+            },
+            customFilter: null,
+            initPage: function () {
+                App.initTable();
+                App.initFilters();
+                App.initSliders();
+            },
+            createSearch: function (colName) { 
+                var formattedName = colName.charAt(0).toUpperCase() + colName.slice(1);
+                return '<div class="search-wrap filter-wrap">'+   
+                            '<h2 class="filter-header">'+formattedName+'</h2>'+                         
+                            '<input data-colName="'+colName+'" class="search-filter" type="text" placeholder="'+formattedName+'">'+
+                        '</div>';
+            },
+            createRange: function(colName) {
+                var min = 0;
+                var max = 100;
+                var val;
+                for(var i = 0; i < App.data.length; i++){
+                    if(!App.data[i][colName]) continue;
+                    val = parseInt(App.data[i][colName].replace(/\D/g,''));
+                    if(isNaN(val)) continue;
+                    if(i === 0){
+                        min = val;
+                        max = val;
+                    } else if(val < min){
+                        min = val;
+                    } else if (val > max){
+                        max = val;
+                    }
+                }
+
+                var formattedName = colName.charAt(0).toUpperCase() + colName.slice(1);
+
+                return '<div class="range-wrap filter-wrap">'+
+                            '<h2 class="filter-header">'+formattedName+'</h2>'+
+                            '<input id="range-filter-min-'+colName+'" data-colName="'+colName+'" class="range-filter-text range-lower" type="number" placeholder="Min" value="'+min+'" min="'+min+'" max="'+max+'">'+
+                            '<input id="range-filter-max-'+colName+'" data-colName="'+colName+'" class="range-filter-text range-upper" type="number" placeholder="Max" value="'+max+'" min="'+min+'" max="'+max+'">'+
+                            '<input class="range-filter" type="hidden" data-colname="'+colName+'" data-from="'+min+'" data-to="'+max+'" value="'+min+','+max+'">'+
+                        '</div>';
+            },
+            createChoice: function (colName) {
+                var val;
+                var content = '<div>';
+                var added = [];
+                for(var i = 0; i < App.data.length; i++){
+                    if(!App.data[i][colName]) continue;
+                    val = App.data[i][colName].replace(/\s/g, '').toUpperCase();   
+                    if(val && added.indexOf(val) === -1){
+                        content += '<div class="choice-box"><input id="choice-filter-'+colName+'-'+val+'" class="choice-filter" value="'+val+'" type="checkbox" data-colname="'+colName+'">'+
+                                '<label for="choice-filter-'+colName+'-'+val+'">'+App.data[i][colName]+'</label></div>';
+                        added.push(val);
+                    }                                   
+                }
+
+                content += '</div>';
+
+                content = $(content).find('.choice-box').sort(function(a, b) {
+                    var valA = $(a).text(), valB = $(b).text();
+                    return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB)
+                });
+
+                var html = '<div class="choice-wrap filter-wrap '+colName+' ">'+
+                    '<h2 class="filter-header">'+colName.charAt(0).toUpperCase() + colName.slice(1)+'</h2>';
+                for(var i = 0; i < content.length; i++){
+                    html += content[i].outerHTML;
+                }
+
+                html += '</div>';
+
+                return html;
+            },
+            initSliders: function () {
+                $('.range-filter').each(function(i){
+                    $(this).jRange({
+                        from: $(this).data('from'),
+                        to: $(this).data('to'),
+                        isRange: true,
+                        width: 148,
+                        theme: 'theme-blue',
+                        format: '%s',
+                        colName: $(this).data('colname'),
+                        onstatechange: function(val){
+                            App.handleRange(this.options.colName, val);
+                        }
+                    });
+                });
+
+                $(document).on("change", ".range-filter-text", function(){
+                    var parent = $(this).parents('.range-wrap');
+                    var changed = $(this).val();
+                    var min = parent.find('.range-lower').val();
+                    var max = parent.find('.range-upper').val();
+                    var slider = parent.find('.range-filter');
+
+                    if(parseInt(min) > parseInt(max)){
+                        if(min === changed){
+                            min = max;
+                        }else if(max === changed){
+                            max = min;
+                        }
+                    }
+
+                    parent.find('.range-lower').val(min);
+                    parent.find('.range-upper').val(max);
+                    slider.jRange('setValue', min+','+max)
+                });
+            },
+            initFilters: function() {
+                var options, html;
+                var filterBox = $('#'+App.filterBoxId);
+                var allRows = $("#"+App.tableId).find("tbody").find("tr");
+                for(var colName in App.columns){
+                    options = App.columns[colName].options;
+                    for(var i = 0; i < options.length; i++){
+                        html = '';
+                        switch(options[i].toLowerCase()){
+                            case App.filters.search:
+                                html = App.createSearch(colName);
+                                App.columns[colName].filters[App.filters.search] = allRows;
+                                break;
+                            case App.filters.range:
+                                html = App.createRange(colName);
+                                App.columns[colName].filters[App.filters.range] = allRows;
+                                break;
+                            case App.filters.choice:
+                                html = App.createChoice(colName);
+                                App.columns[colName].filters[App.filters.choice] = allRows;
+                                break;
+                        }
+                        filterBox.append(html);
+                    }                        
+                }                
+            },
+            measureString: function (string, ruler, minLength) {
+                if(typeof ruler === 'undefined'){
+                    $('body').append('<span id="ruler" style="visibility: hidden; white-space: nowrap;"></span>');
+                    ruler = $('#ruler');
+                }
+
+                if(typeof minLength === 'undefined') minLength = 0;
+                
+                var testLength;
+                var stringArr = string.split(" ");
+
+                length = minLength;
+
+                for(var i = 0; i < stringArr.length; i++){
+                    ruler.html(stringArr[i])
+                    testLength = ruler.width();
+                    length = (testLength > length) ? testLength : length;
+                }
+
+                return length;
+
+            },
+            initTable: function () {
+                var table = $('#'+App.tableId);
+                var html = '<thead><tr>';
+                var val, cell;
+                var ruler = $('#ruler');
+                    
+                for(var colName in App.columns){
+                    App.columns[colName].width = App.measureString(colName, ruler)                
+                    html += '<th class="col-'+colName+'" data-colname="'+colName+'">'+colName.charAt(0).toUpperCase() + colName.slice(1)+'</th>';
+                }
+
+                html += '</tr></thead>';
+
+                html += '<tbody>';
+
+                for(var i = 0; i < App.data.length; i++){
+                    html += '<tr>';
+                    for(var colName in App.columns){
+                        val = (App.data[i][colName]) ? App.data[i][colName] : '';                        
+                        App.columns[colName].width = App.measureString(val, ruler, App.columns[colName].width)
+                        html += '<td class="col-'+colName+'">'+val+'</td>';
+                    }
+                    html += '</tr>';
+                }
+
+                html += '</tbody>';
+
+                table.append(html);
+                $('.loader-wrap').hide();
+
+                for(var colName in App.columns){
+                    cell = table.find('.col-'+colName);
+                    var paddingLeft = parseInt(cell.css('padding-left').replace('px', ''))
+                    var paddingRight = parseInt(cell.css('padding-right').replace('px', ''))
+                    cell.css("min-width", App.columns[colName].width+paddingLeft+paddingRight + 1) // +1 to stop rounding errors
+                }
+
+                table.floatThead({
+                    scrollContainer: function(table){
+                        return table.closest('main');
+                    },
+                    position: 'fixed'
+                });
+            },
+            parseColumn: function (column) {
+                var colArr = column.split("-");
+                var name = colArr[0]
+                var options = []
+                colArr.splice(0,1);
+                if(App.columns[name] && App.columns[name].options){     
+                    options = App.columns[name].options.concat(colArr);
+                    for(var i=0; i<options.length; ++i) {
+                        for(var j=i+1; j<options.length; ++j) {
+                            if(options[i] === options[j])
+                                options.splice(j--, 1);
+                        }
+                    }
+                }else{   
+                    App.columns[name] = {
+                        options: [],
+                        filters: {},
+                        width: 0
+                    };               
+                    options =  colArr;
+                }
+
+                App.columns[name].options = options;
+                return name;
+            },
+            parseData: function (sheet){
+                var keynameArr, columnName, row, parsed = [];
+                for(var i = 0; i < sheet.length; i++){
+                    row = {};
+                    for(var key in sheet[i]){                        
+                        keynameArr =  key.split("gsx$");
+                        if(keynameArr.length === 2){
+                            columnName = App.parseColumn(keynameArr[1]);
+                            row[columnName] = sheet[i][key]['$t'];
+                        }
+                    }
+                    parsed.push(row);
+                }
+                
+                App.sheetsParsed += 1;
+
+                return parsed;
+            },
+            getData: function () {
+                $.ajax('https://spreadsheets.google.com/feeds/worksheets/'+App.sheetId+'/public/full?alt=json')
+                .done(function(rsp){
+                    var sheets = rsp.feed.entry;
+                    for(var i = 0; i < sheets.length; i++){
+                        var url = sheets[i].link[0].href+'?alt=json';
+                        
+                        $.ajax({
+                        url: url,
+                        sheetCount: sheets.length
+                        }).done(function(sheet){
+                            App.data = App.data.concat(App.parseData(sheet.feed.entry));
+                            if(this.sheetCount === App.sheetsParsed) App.initPage();                            
+                        });                        
+                    }
+                });
+            },
+            getCellValue: function(row, index) {
+                return $(row).find('td').eq(index).text().toUpperCase();
+            },
+            compareRow: function(index){
+                return function(a, b) {
+                    var valA = App.getCellValue(a, index), valB = App.getCellValue(b, index)
+                    return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB)
+                }
+            },
+            sortTable: function(head) {
+                var table = $("#"+App.tableId);
+                var rows = table.find('tr:gt(0)').toArray().sort(App.compareRow(head.index()));
+                this.asc = !this.asc;
+                $('.sort-asc').removeClass('sort-asc');
+                $('.sort-desc').removeClass('sort-desc')
+                if (!this.asc){
+                    rows = rows.reverse()
+                    head.addClass('sort-desc');
+                }else{
+                    head.addClass('sort-asc');
+                }
+                for (var i = 0; i < rows.length; i++){table.append(rows[i])}
+            },
+            textMatched: function(colName, text, val) {
+                var exact = App.columns[colName].options.indexOf('exact');
+                text = text.toUpperCase();
+                val = val.toUpperCase();
+
+                if(exact){
+                    return text === val
+                }else{
+                    return text.indexOf(val) > -1
+                }
+            },
+            handleFilters: function() {
+                var column;
+                var _rows = $("#"+App.tableId).find("tbody").find("tr").hide();
+                if(App.customFilter) _rows = _rows.filter(App.customFilter);
+                for(var colName in App.columns){
+                    column = App.columns[colName];
+                    for(var i in column.filters){
+                        _rows = _rows.filter(column.filters[i]);
+                    }
+                }
+                _rows.show();
+            },
+            handleRange: function(colName, output){
+                var range = output.split(",")
+                var rows = $("#"+App.tableId).find("tbody").find("tr");                
+                var _rows = $();
+                $('#range-filter-min-'+colName).val(range[0]);
+                $('#range-filter-max-'+colName).val(range[1]);
+
+                _rows = _rows.add(rows.filter(function(index){
+                    val = parseInt($(this).find("td.col-"+colName).text());
+                    return (val >=range[0] && val <= range[1]);
+                }));
+
+                App.columns[colName].filters[App.filters.range] = _rows;
+                App.handleFilters(); 
+            },
+            handleSearch: function(colName, data) {
+                var text, val;
+                var rows = $("#"+App.tableId).find("tbody").find("tr");                
+                var _rows = $();
+
+                if(data.length === 1 && !data[0].trim()){
+                    _rows = rows;
+                }else{
+                    for(var i = 0; i < data.length; i++){
+                        val = data[i].trim().toUpperCase()
+                        if(!val) continue;
+                        _rows = _rows.add(rows.filter(function(index){
+                            text = $(this).find("td.col-"+colName).text();
+                            return App.textMatched(colName, text, val);
+                        }));
+                    };
+                }                
+                App.columns[colName].filters[App.filters.search] = _rows;
+                App.handleFilters(); 
+            }, 
+            handleChoice: function(colName, wrapper) {
+                var text;
+                var rows = $("#"+App.tableId).find("tbody").find("tr");                
+                var _rows = $();   
+                
+                var inputs = wrapper.find('.choice-filter:checkbox:checked');
+
+                if(!inputs.length){
+                    _rows = rows;
+                }else{
+                    inputs.each(function(i){
+                        var val = $(this).val();
+                        _rows = _rows.add(rows.filter(function(index){ 
+                            text = $(this).find("td.col-"+colName).text().replace(/\s/g, '');
+                            return !val || App.textMatched(colName, text, val);
+                        }));
+                    });
+                }
+                
+                App.columns[colName].filters[App.filters.choice] = _rows;
+                App.handleFilters(); 
+            }, 
+            bind: function() {
+                $(document).on("keyup", ".search-filter", function(){
+                    var colName = $(this).data('colname');
+                    var data = this.value.split(",");
+                    App.handleSearch(colName, data);
+                });
+
+                $(document).on('change', '.choice-filter', function(){
+                    var colName = $(this).data('colname');
+                    var wrapper = $(this).parents('.choice-wrap');
+                    App.handleChoice(colName, wrapper);
+                });
+
+                $(document).on('click', 'thead th', function(){
+                    App.sortTable($(this));
+                });
+
+                $(document).on('click', '.filter-header', function(){
+                    $(this).parents('.filter-wrap').toggleClass('closed-filter');
+                });
+            }, 
+            init: function () {
+                App.bind();
+                App.getData();
+            }
+        }       
+    </script>
+
+    <script>
+        $(function(){ 
+            App.sheetId = '', //Enter Google Sheets ID for shareable sheet
+            App.tableId = 'compare-table',
+            App.filterBoxId = 'filter-container'
+            App.init() 
+            $('.hamburger').on('click', function(){
+                $('main').toggleClass('closed-sidebar');
+                setTimeout(function(){
+                    $('#'+App.tableId).floatThead('reflow');
+                }, 400);
+            });
+
+            $("#quick-search").keyup(function(){
+                var data = this.value.split(",");
+                var text, val;
+                var rows = $("#"+App.tableId).find("tbody").find("tr");
+                var _rows = $();
+                if(data.length === 1 && !data[0].trim()){
+                    _rows = rows;
+                }else{
+                    for(var i = 0; i < data.length; i++){
+                        val = data[i].trim().toUpperCase();
+                        if(!val) continue;
+                        _rows = _rows.add(rows.filter(function(index){
+                            text = $(this).find("td").text().toUpperCase();
+                            return text.indexOf(val) > -1;
+                        }));
+                    };
+                }
+                App.customFilter = _rows;
+                App.handleFilters();
+            });
+        })
+    </script>
+    
+</body>
+</html>
